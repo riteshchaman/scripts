@@ -25,10 +25,3 @@ xml_file = sys.argv[1]
 conf = ElementTree.parse(xml_file).getroot()
 printprop(xml_file, root = conf)
 
-##new_file = "core-site.new.xml";
-#conf_file = open(new_file,'w')
-#conf_file.write(ElementTree.tostring(conf))
-#conf_file.close()
-
-#format by calling xmllint in bash script - future
-#xmllint --format "$new_file" > "$new_file".pp && mv "$new_file".pp "$new_file"

@@ -25,7 +25,7 @@ xml_file = sys.argv[1]
 conf = ElementTree.parse(xml_file).getroot()
 printprop(xml_file, root = conf)
 
-#new_file = "core-site.new.xml";
+##new_file = "core-site.new.xml";
 #conf_file = open(new_file,'w')
 #conf_file.write(ElementTree.tostring(conf))
 #conf_file.close()

@@ -2,19 +2,21 @@ import sys
 import re
 import kdtree
 
-data = []
-data_int = []
+##Initiating lists and dictionaries
 query = []
 query_int = []
 tree_col = []
 tree_col_int = []
-thisdict ={}
+thisdict = {}
+t_dict={}
 
-##Adding all three elements in dictionary##
+
 def datadict(x):
-	arg1 = (x[0]+","+x[1])
-	arg2=x[2]
-	thisdict[arg1]=arg2
+        arg1 = (x[0]+","+x[1])
+        arg2=x[2]
+        t_dict.update({arg1:arg2})
+        return(t_dict)
+
 
 ##Get the value for key value from thisdict
 def neigh(value1,value2):
@@ -28,11 +30,22 @@ def neigh(value1,value2):
 	q2 = (num2[0]+","+num2[1])
 	neigh_val1=thisdict[q1]			##Fetching value for key created
 	neigh_val2=thisdict[q2]
-	decision(neigh_val1,neigh_val2)
+	final_val1 = decision(neigh_val1,neigh_val2)
+	return (final_val1)
+	
 
-def decision(x,y)
+def decision(x,y):
 	if "x"=="y":
-		return neigh_val1
+		return (x)  
+	elif "x" != "y":
+		return (x) ##Taking closest neighbor as high priority
+
+# Creating tree from coordinates
+def create_tree (k,list):
+	emptyTree = kdtree.create(dimensions=2)
+	f_tree = kdtree.create(list)
+	f_tree = f_tree.rebalance()
+	return (f_tree)
 
 ####Reading the data from input file#####
 for line in sys.stdin:
@@ -43,26 +56,47 @@ for line in sys.stdin:
 	else:
 		col_line=line.rstrip().split(" ")
 		if len(col_line) == 3:
-			datadict(col_line)
+			thisdict=datadict(col_line)
 			tree_col.append(col_line[:2])
 		elif len(col_line) == 2:
 			query.append(col_line)
 
-##Converting all string lists to integer values##
-for x in query:
-	query_int.append(list(map(float,x)))
 
-for x in tree_col:
-	tree_col_int.append(list(map(float,x)))
+
+##Converting all string lists to integer values##
+def convertion_query(q):
+	q_int=[]
+	for x in q:
+		q_int.append(list(map(float,x)))
+	return (q_int)
+
+def convertion_tree_list (t):
+	t_col_int=[]
+	for x in t:
+		t_col_int.append(list(map(float,x)))
+	return (t_col_int)
+
+##Invoking convertions
+query_int=convertion_query(query)
+tree_col_int=convertion_tree_list(tree_col)
+
+##Creating tree from elements in list 
+tree=create_tree(2,tree_col_int)
 
 	
-# Creating tree from coordinates
-emptyTree = kdtree.create(dimensions=2)
-tree = kdtree.create(tree_col_int)
-
 #Fetching query and finding the nearest neighbour
 for out in query_int:
 	x = out[0]
 	y = out[1]
 	neighbors=(tree.search_nn((x,y)))
-	neigh(neighbors[0],neighbors[1])
+	new_value=neigh(neighbors[0],neighbors[1])
+	print (x,y,new_value)	
+	x = format(float(out[0]), '.2f')
+	y = format(float(out[1]), '.2f')
+	str1=' '.join((str(x),str(y),new_value))
+	str2=str1.split(" ")[:3]
+	thisdict=datadict(str2) 						##Updating the dictionary with the new value
+	str3=str1.split(" ")[:2]
+	tree_col.append(str3)					##Updating the list with which tree is created
+	tree_col_int=convertion_tree_list(tree_col)          	##Reconverting list to float values for error minimization
+	tree=create_tree(2,tree_col_int) 			##Recreating tree before every new search
